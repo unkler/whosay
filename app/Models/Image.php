@@ -15,7 +15,7 @@ class Image extends Model
         'filename',
     ];
 
-    public function shops(): BelongsTo
+    public function owner(): BelongsTo
     {
         return $this->belongsTo(Owner::class);
     }
