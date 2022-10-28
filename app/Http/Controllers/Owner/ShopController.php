@@ -23,8 +23,7 @@ class ShopController extends Controller
             if (!is_null($id)) {
                 $shopsOwnerId = Shop::findOrFail($id)->owner->id;
                 $ownerId = (int)$shopsOwnerId;
-                $loginId = Auth::id();
-                if ($ownerId !== $loginId) {
+                if ($ownerId !== Auth::id()) {
                     abort(404);
                 }
             }
