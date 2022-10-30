@@ -194,17 +194,17 @@ class ProductController extends Controller
                 $product->is_selling = $request->is_selling;
                 $product->save();
                 
-                if ($request->type === '1') {
-                    $addQuantity = $request->quantity;
+                if ($request->type === \Constant::PRODUCT_LIST['add']) {
+                    $afterAdjustmentQuantity = $request->quantity;
                 }
-                if ($request->type === '2') {
-                    $addQuantity = $request->quantity * -1;
+                if ($request->type === \Constant::PRODUCT_LIST['reduce']) {
+                    $afterAdjustmentQuantity = $request->quantity * -1;
                 }
 
                 Stock::create([
                     'product_id' => $product->id,
                     'type' => $request->type,
-                    'quantity' => $addQuantity,
+                    'quantity' => $afterAdjustmentQuantity,
                 ]);
             }, 2);
         } catch(Throwable $e) {
