@@ -13,6 +13,7 @@ use App\Models\Shop;
 use App\Models\PrimaryCategory;
 use App\Models\Owner;
 use App\Models\Stock;
+use App\Http\Requests\ProductRequest;
 use Throwable;
 
 class ProductController extends Controller
@@ -78,25 +79,9 @@ class ProductController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(ProductRequest $request)
     {
-        $request->validate([
-            'name' => ['required', 'string', 'max:50'],
-            'information' => ['required', 'string', 'max:1000'],
-            'price' => ['required', 'integer'],
-            'quantity' => ['required', 'integer'],
-            'sort_order' => ['nullable', 'integer'],
-            'shop_id' => ['required', 'exists:shops,id'],
-            'category' => ['required', 'exists:secondary_categories,id'],
-            'image1' => ['nullable', 'exists:images,id'],
-            'image2' => ['nullable', 'exists:images,id'],
-            'image3' => ['nullable', 'exists:images,id'],
-            'image4' => ['nullable', 'exists:images,id'],
-            'is_selling' => ['required'],
-        ]);
-
         try {
-
             DB::transaction(function() use ($request) {
                 $product = Product::create([
                     'name' => $request->name,
@@ -108,7 +93,7 @@ class ProductController extends Controller
                     'image1' => $request->image1,
                     'image2' => $request->image2,
                     'image3' => $request->image3,
-                    'image4' => $request->image5,
+                    'image4' => $request->image4,
                     'is_selling' => $request->is_selling,
                 ]);
     
@@ -176,9 +161,63 @@ class ProductController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(ProductRequest $request, $id)
     {
-        //
+        $request->validate([
+            'current_quantity' => ['required', 'integer'],
+        ]);
+        
+        $product = Product::findOrFail($id);
+        $quantity = Stock::where('product_id', $product->id)->sum('quantity');
+        if ($request->current_quantity !== $quantity) {
+            $product_id = $request->route()->parameter('product');
+            return redirect()
+                ->route('owner.products.edit', ['product' => $product_id])
+                ->with([
+                    'status' => 'alert',
+                    'message' => '在庫数が変更されています。再度確認して下さい。'
+                ]);
+        }
+
+        try {
+            DB::transaction(function() use ($product, $request) {
+                $product->name = $request->name;
+                $product->information = $request->information;
+                $product->price = $request->price;
+                $product->sort_order = $request->sort_order;
+                $product->shop_id = $request->shop_id;
+                $product->secondary_category_id = $request->category;
+                $product->image1 = $request->image1;
+                $product->image2 = $request->image2;
+                $product->image3 = $request->image3;
+                $product->image4 = $request->image5;
+                $product->is_selling = $request->is_selling;
+                $product->save();
+                
+                if ($request->type === '1') {
+                    $addQuantity = $request->quantity;
+                }
+                if ($request->type === '2') {
+                    $addQuantity = $request->quantity * -1;
+                }
+
+                Stock::create([
+                    'product_id' => $product->id,
+                    'type' => $request->type,
+                    'quantity' => $addQuantity,
+                ]);
+            }, 2);
+        } catch(Throwable $e) {
+            Log::error($e);
+            throw $e;
+        }
+
+        return redirect()
+        ->route('owner.products.index')
+        ->with([
+            'status' => 'info',
+            'message' => '商品を更新しました'
+        ]);
     }
 
     /**
