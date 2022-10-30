@@ -111,6 +111,13 @@
                       </div>
                     </div>
                  </form>
+                 <form id="delete_{{ $product->id }}" method="POST" action="{{ route('owner.products.destroy', ['product' => $product->id]) }}">
+                  @method('DELETE')
+                  @csrf
+                  <div class="p-2 w-full flex justify-around mt-4">
+                    <a href="#" data-id="{{ $product->id }}" onclick="deletePost(this)" class="text-white bg-gray-400 border-0 py-2 px-4 focus:outline-none hover:bg-gray-500 rounded">削除</a>
+                  </div>
+                </form>
               </div>
           </div>
       </div>
@@ -132,5 +139,12 @@
         document.getElementById(imageName + '_hidden').value = imageId
       })
     })
+
+    function deletePost(e) {
+      'use strict';
+      if (confirm('削除してよろしいですか？')) {
+        document.getElementById('delete_' + e.dataset.id).submit();
+      }
+    }
   </script>
 </x-app-layout>
