@@ -57,23 +57,27 @@
                       <div class="text-sm mb-4 title-font text-gray-500 tracking-widest">{{ $product->category->name }}</div>
                       <div class="text-gray-900 text-3xl mb-4 title-font font-medium">{{ $product->name }}</div>
                       <p class="leading-relaxed mb-4">{{ $product->information }}</p>
-                      <div class="flex justify-around items-center">
-                        <div>
-                          <span class="title-font font-medium text-2xl text-gray-900">{{ number_format($product->price) }}</span>
-                          <span class="text-sm text-gray-700">円（税込）</span>
-                        </div>
-                        <div class="flex items-center">
+                      <form method="POST" action="{{ route('user.cart.add') }}" >
+                        @csrf
+                        <div class="flex justify-around items-center">
+                          <div>
+                            <span class="title-font font-medium text-2xl text-gray-900">{{ number_format($product->price) }}</span>
+                            <span class="text-sm text-gray-700">円（税込）</span>
+                          </div>
+                          <div class="flex items-center">
                             <span class="mr-3">数量</span>
                             <div class="relative">
                               <select name="quantity" class="rounded border appearance-none border-gray-300 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-200 focus:border-indigo-500 text-base pl-3 pr-10">
                                 @for ($i = 1; $i <= $quantity; $i ++)
-                                  <option value="{{ $i }}">{{ $i }}</option>
+                                <option value="{{ $i }}">{{ $i }}</option>
                                 @endfor
                               </select>
                             </div>
+                          </div>
+                          <button class="flex text-white bg-rose-700 border-0 py-2 px-6 focus:outline-none hover:bg-rose-800 rounded">カートに入れる</button>
+                          <input type="hidden" name="product_id" value="{{ $product->id }}">
                         </div>
-                        <button class="flex text-white bg-rose-700 border-0 py-2 px-6 focus:outline-none hover:bg-rose-800 rounded">カートに入れる</button>
-                      </div>
+                      </form>
                     </div>
                   </div>
                   <div class="border-t border-gray-400 my-8"></div>
