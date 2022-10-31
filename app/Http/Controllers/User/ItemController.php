@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Models\Product;
+use App\Models\Stock;
 
 class ItemController extends Controller
 {
@@ -45,6 +46,10 @@ class ItemController extends Controller
     {
         $product = Product::findOrFail($id);
 
-        return view('user.show', compact('product'));
+        $quantity = Stock::where('product_id', $product->id)->sum('quantity');
+
+        if ($quantity > \Constant::MAX_CART_QUANTITY) $quantity = \Constant::MAX_CART_QUANTITY;
+
+        return view('user.show', compact('product', 'quantity'));
     }
 }
