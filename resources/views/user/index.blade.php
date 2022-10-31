@@ -16,8 +16,10 @@
                         <a href="">
                             <div class="border rounded p-2 md:p-4">
                                 <x-thumbnail filename="{{  $product->imageFirst->filename ?? '' }}" type="products" />
-                                <div class="text-sm text-gray-600 mt-2">
-                                    {{ $product->name }}
+                                <div class="mt-4">
+                                    <h3 class="text-gray-500 text-xs tracking-widest title-font mb-1">{{ $product->category->name }}</h3>
+                                    <h2 class="text-gray-900 title-font text-lg font-medium">{{ $product->name }}</h2>
+                                    <p class="mt-1">{{ number_format($product->price) }}<span class="text-sm text-gray-600">円（税込）</p>
                                 </div>
                             </div>
                         </a>
