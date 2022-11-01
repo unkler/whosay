@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\User;
 use App\Models\Cart;
+use App\Models\Stock;
 
 class CartController extends Controller
 {
@@ -61,6 +62,23 @@ class CartController extends Controller
 
         $lineItems = [];
         foreach($products as $product) {
+
+            $quantity = Stock::where('product_id', $product->id)->sum('quantity');
+            if ($product->pivot->quantity > $quantity) {
+                return redirect()
+                    ->route('user.cart.index')
+                    ->with([
+                        'status' => 'alert',
+                        'message' => '在庫不足のため購入できません'
+                    ]);
+            }
+
+            Stock::create([
+                'product_id' => $product->id,
+                'type' => \Constant::PRODUCT_LIST['reduce'],
+                'quantity' => $product->pivot->quantity * -1,
+            ]);
+
             $lineItem = [
                 'name' => $product->name,
                 'description' => $product->information,
