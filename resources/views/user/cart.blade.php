@@ -9,6 +9,7 @@
       <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
           <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
               <div class="p-6 bg-white border-b border-gray-200">
+                <x-flash-message />
                   @if (count($products) > 0)
                     @foreach ($products as $product)
                       <div class="md:flex md:items-center mb-2">
@@ -36,6 +37,12 @@
                         </div>
                       </div>
                     @endforeach
+                    <div class="my-2 text-right">
+                      小計：{{ number_format($totalPrice) }}<span class="text-sm text-gray-600">円（税込）</span>
+                    </div>
+                    <div class="flex justify-end">
+                      <button onclick="location.href='{{ route('user.cart.checkout')}}'" class=" text-white bg-rose-700 border-0 py-2 px-6 focus:outline-none hover:bg-rose-800 rounded">購入する</button>
+                    </div>
                   @else
                     カートに商品は入っていません。
                   @endif
