@@ -114,4 +114,19 @@ class Product extends Model
 
         return $query->where('secondary_category_id', $categoryId);
     }
+
+    public function scopeSearchKeyword($query, $keyword)
+    {
+        if (is_null($keyword)) return;
+
+        $spaceConvert = mb_convert_kana($keyword, 's');
+
+        $keywords = preg_split('/[\s]+/', $spaceConvert, -1, PREG_SPLIT_NO_EMPTY);
+
+        foreach($keywords as $keyword) {
+            $query->where('products.name', 'like', '%' . $keyword . '%');
+        }
+
+        return $query;
+    }
 }
