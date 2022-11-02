@@ -4,11 +4,9 @@ namespace App\Http\Controllers\User;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 use App\Models\Product;
 use App\Models\Stock;
 use App\Models\PrimaryCategory;
-
 class ItemController extends Controller
 {
     public function __construct()
